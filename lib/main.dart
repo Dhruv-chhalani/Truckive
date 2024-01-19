@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:loginuicolors/SettingsScreen.dart';
 import 'package:loginuicolors/login.dart';
 import 'package:loginuicolors/register.dart';
 import 'package:loginuicolors/forgot.dart';

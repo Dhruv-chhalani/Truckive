@@ -21,7 +21,7 @@ class _MyRegisterState extends State<MyRegister> {
   }
 
   Widget build(BuildContext context) {
-    Future<void> createUser(email, password) async {
+    Future<bool> createUser(email, password) async {
       try {
         final User = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
@@ -35,6 +35,11 @@ class _MyRegisterState extends State<MyRegister> {
         }
       } catch (e) {
         print(e);
+      }
+      if (FirebaseAuth.instance.currentUser != null) {
+        return true;
+      } else {
+        return false;
       }
     }
 
@@ -59,7 +64,13 @@ class _MyRegisterState extends State<MyRegister> {
     void register() async {
       final email = emailController.text;
       final password = passwordController.text;
-      await createUser(email, password);
+
+      final userCreated = await createUser(email, password);
+      if (userCreated) {
+        Navigator.pushNamed(context, 'dashboard');
+      } else {
+        print('Error');
+      }
       //dispose();
     }
 
@@ -186,7 +197,6 @@ class _MyRegisterState extends State<MyRegister> {
                                   color: Colors.white,
                                   onPressed: () {
                                     register();
-				Navigator.pushNamed(context, 'dashboard');
                                   },
                                   icon: Icon(Icons.arrow_forward),
                                 ),

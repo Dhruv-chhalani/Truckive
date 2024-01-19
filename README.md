@@ -19,7 +19,7 @@ If you found this project useful, then please consider giving it a :star: on Git
 
 ## Project Created & Maintained By
 
-Dhruv chhalani, Aaryan Choskhi and Nishant Bhurani 
+Dhruv chhalani, Aaryan Chokshi and Nishant Bhurani 
 
 ## Getting Started
 

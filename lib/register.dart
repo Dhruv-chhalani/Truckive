@@ -196,7 +196,7 @@ class _MyRegisterState extends State<MyRegister> {
                                 child: IconButton(
                                   color: Colors.white,
                                   onPressed: () {
-                                    register();
+                                    await register();
                                   },
                                   icon: Icon(Icons.arrow_forward),
                                 ),

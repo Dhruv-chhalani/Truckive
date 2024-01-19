@@ -8,8 +8,53 @@ class MyLogin extends StatefulWidget {
 }
 
 class _MyLoginState extends State<MyLogin> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
+    Future<bool> getUser(email, password) async {
+      try {
+        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: email,
+            password: password
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          print('No user found for that email.');
+        } else if (e.code == 'wrong-password') {
+          print('Wrong password provided for that user.');
+        }
+      } catch(e){
+        print(e);
+      }
+
+      if (FirebaseAuth.instance.currentUser != null) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    void login() async {
+      final email = emailController.text;
+      final password = passwordController.text;
+
+      final userCreated = await createUser(email, password);
+      if (userCreated) {
+        Navigator.pushNamed(context, 'dashboard');
+      } else {
+        print('Error');
+      }
+      //dispose();
+    }
+
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -43,6 +88,7 @@ class _MyLoginState extends State<MyLogin> {
                         children: [
                           TextField(
                             style: TextStyle(color: Colors.grey),
+                            controller: emailController,
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -70,6 +116,7 @@ class _MyLoginState extends State<MyLogin> {
                           ),
                           TextField(
                             style: TextStyle(color: Colors.grey),
+                            controller: passwordController,
                             obscureText: true,
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
@@ -113,7 +160,7 @@ class _MyLoginState extends State<MyLogin> {
                                 child: IconButton(
                                   color: Colors.grey,
                                   onPressed: () {
-                                    Navigator.pushNamed(context, 'dashboard');
+                                    await login();
                                   },
                                   icon: Icon(
                                     Icons.arrow_forward,

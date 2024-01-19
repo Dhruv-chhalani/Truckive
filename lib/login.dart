@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MyLogin extends StatefulWidget {
@@ -19,20 +20,61 @@ class _MyLoginState extends State<MyLogin> {
   }
 
   Widget build(BuildContext context) {
+    Future<void> _showSuccessDialog() async {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Successful'),
+            content: Text('You have been logged in Successfully'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, 'dashboard');
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    Future<void> _showErrorDialog(String errorMessage) async {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Login Failed'),
+            content: Text(errorMessage),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     Future<bool> getUser(email, password) async {
       try {
-        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: email,
-            password: password
-        );
+        final credential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
+          await _showErrorDialog('No user found for that email.');
           print('No user found for that email.');
         } else if (e.code == 'wrong-password') {
+          await _showErrorDialog('Wrong password provided for that user.');
           print('Wrong password provided for that user.');
         }
-      } catch(e){
-        print(e);
+      } catch (e) {
+        await _showErrorDialog("Login Failed");
       }
 
       if (FirebaseAuth.instance.currentUser != null) {
@@ -42,13 +84,14 @@ class _MyLoginState extends State<MyLogin> {
       }
     }
 
-    void login() async {
+    Future<void> login() async {
       final email = emailController.text;
       final password = passwordController.text;
 
-      final userCreated = await createUser(email, password);
+      final userCreated = await getUser(email, password);
       if (userCreated) {
-        Navigator.pushNamed(context, 'dashboard');
+        await _showSuccessDialog();
+        //Navigator.pushNamed(context, 'dashboard');
       } else {
         print('Error');
       }
@@ -159,7 +202,7 @@ class _MyLoginState extends State<MyLogin> {
                                 backgroundColor: Color(0xff4c505b),
                                 child: IconButton(
                                   color: Colors.grey,
-                                  onPressed: () {
+                                  onPressed: () async {
                                     await login();
                                   },
                                   icon: Icon(

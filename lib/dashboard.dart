@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -37,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: FlutterMap(
         options: MapOptions(
           initialCenter: LatLng(23.0261076, 72.5565443),
-          initialZoom: 15,
+          initialZoom: 14,
         ),
         children: [
           TileLayer(
@@ -114,10 +115,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).bottomAppBarColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
           ),
           child: BottomNavigationBar(
             selectedItemColor: Colors.blue,
@@ -537,10 +534,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 // Add your sign out logic here
                 // For example, you can navigate to the sign-in screen
-                Navigator.of(context).pop();
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushNamed(context, 'login');
               },
               child: Text('Sign Out'),
             ),

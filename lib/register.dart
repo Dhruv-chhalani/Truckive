@@ -21,6 +21,47 @@ class _MyRegisterState extends State<MyRegister> {
   }
 
   Widget build(BuildContext context) {
+    Future<void> _showSuccessDialog() async {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Registration Successful'),
+            content: Text('Your account has been created successfully.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, 'login');
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    Future<void> _showErrorDialog(String errorMessage) async {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Registration Failed'),
+            content: Text(errorMessage),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     Future<bool> createUser(email, password) async {
       try {
         final User = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -30,13 +71,18 @@ class _MyRegisterState extends State<MyRegister> {
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           print('The password provided is too weak.');
+          await _showErrorDialog('The password provided is too weak.');
         } else if (e.code == 'email-already-in-use') {
           print('The account already exists for that email.');
+          await _showErrorDialog('The account already exists for that email');
         }
-      } catch (e) {
-        print(e);
       }
+      // catch (e) {
+      //   await _showErrorDialog('Error: $e');
+      // }
+
       if (FirebaseAuth.instance.currentUser != null) {
+        await FirebaseAuth.instance.signOut();
         return true;
       } else {
         return false;
@@ -61,13 +107,14 @@ class _MyRegisterState extends State<MyRegister> {
       return await FirebaseAuth.instance.signInWithCredential(credential);
     }
 
-    void register() async {
+    Future<void> register() async {
       final email = emailController.text;
       final password = passwordController.text;
 
       final userCreated = await createUser(email, password);
       if (userCreated) {
-        Navigator.pushNamed(context, 'dashboard');
+        await _showSuccessDialog();
+        //Navigator.pushNamed(context, 'login');
       } else {
         print('Error');
       }
@@ -195,7 +242,7 @@ class _MyRegisterState extends State<MyRegister> {
                                 backgroundColor: Color(0xff4c505b),
                                 child: IconButton(
                                   color: Colors.white,
-                                  onPressed: () {
+                                  onPressed: () async {
                                     await register();
                                   },
                                   icon: Icon(Icons.arrow_forward),

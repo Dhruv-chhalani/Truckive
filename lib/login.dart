@@ -94,6 +94,7 @@ class _MyLoginState extends State<MyLogin> {
         //Navigator.pushNamed(context, 'dashboard');
       } else {
         print('Error');
+        _showErrorDialog("error");
       }
       //dispose();
     }

@@ -117,6 +117,7 @@ class _MyRegisterState extends State<MyRegister> {
         //Navigator.pushNamed(context, 'login');
       } else {
         print('Error');
+        _showErrorDialog("error");
       }
       //dispose();
     }
